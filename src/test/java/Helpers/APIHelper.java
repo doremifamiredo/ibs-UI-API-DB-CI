@@ -16,7 +16,7 @@ import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInC
 
 public class APIHelper {
     private static final RequestSpecification requestSpec = new RequestSpecBuilder()
-            .setBaseUri("http://localhost:8080/api/food")
+            .setBaseUri("http://149.154.71.152:8080")
             .setContentType(ContentType.JSON)
             .log(LogDetail.ALL)
             .build();
@@ -36,7 +36,7 @@ public class APIHelper {
         JSESSIONID = given()
                 .spec(requestSpec)
                 .body(product)
-                .when().post()
+                .when().post("/api/food")
                 .then()
                 .statusCode(200)
                 .extract().detailedCookie("JSESSIONID");
@@ -48,7 +48,7 @@ public class APIHelper {
                 given()
                 .spec(requestSpec)
                 .cookie(JSESSIONID)
-                .when().get()
+                .when().get("/api/food")
                 .then().spec(responseSpec)
                 .extract().body().asString(), Product[].class);
     }
@@ -56,7 +56,8 @@ public class APIHelper {
     @Step("Сброс тестовых данных")
     public static void resettingData() {
         given()
-                .when().post("http://localhost:8080/api/data/reset")
+                .spec(requestSpec)
+                .when().post("/api/data/reset")
                 .then()
                 .statusCode(200);
     }

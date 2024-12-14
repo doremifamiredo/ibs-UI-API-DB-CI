@@ -1,5 +1,6 @@
 package Helpers;
 
+import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -43,11 +44,13 @@ public class ProductList implements Page {
         menu.get(0).click();
     }
 
+    @Step("Продукт отсутствует в таблице")
     public boolean searchWordInTable(String word) {
         return elements.stream().anyMatch(
                 s -> s.getText().contains(word));
     }
 
+    @Step("Добавить новый продукт")
     public ProductList addProduct(ProductInfo prodInfo) {
         btnAdd.click();
         addingForm.findElement(By.id("name")).sendKeys(prodInfo.name);
@@ -83,20 +86,14 @@ public class ProductList implements Page {
             }
             this.isExotic = description.contains("true");
         }
-
-        // для объекта по запросу SQL
-        public ProductInfo(String name, String isFruit, int isExotic) {
-            this.name = name;
-            this.isFruit = isFruit.equals("FRUIT");
-            if (isExotic == 1) this.isExotic = true;
-        }
-
     }
 
+    @Step("Получить последний в списке продукт")
     public String getLastProduct() {
         return elements.get(elements.size() - 1).getText();
     }
 
+    @Step("Сброс тестовых данных")
     public ProductList dataReset() {
         dropDown.click();
         menu.get(menu.size() - 1).click();

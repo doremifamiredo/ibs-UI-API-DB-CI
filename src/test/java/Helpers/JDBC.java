@@ -14,11 +14,13 @@ public class JDBC {
     private static final String insertProd = "INSERT INTO FOOD (FOOD_NAME ,FOOD_TYPE ,FOOD_EXOTIC ) SELECT ?, ?, ?;";
     private static Connection connection;
     private static final String[] foodTypes = {"VEGETABLE", "FRUIT"};
+    private static final String jdbcURL = "jdbc:h2:tcp://qualit.applineselenoid.fvds.ru/mem:testdb";
+    private static final String jdbcUser = "user";
+    private static final String jdbcPassword = "pass";
 
     @Step("Проверить отсутствие добаляемого продукта в БД")
     public static int countFoodName(String foodName) throws SQLException {
-        Connection connection = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mem:testdb",
-                "user", "pass");
+        Connection connection = DriverManager.getConnection(jdbcURL, jdbcUser, jdbcPassword);
         PreparedStatement statement = connection.prepareStatement(count);
         statement.setString(1, foodName);
         ResultSet resultExp = statement.executeQuery();
@@ -30,8 +32,7 @@ public class JDBC {
 
     @Step("Добавить новый продукт в БД")
     public static int insertProductIntoDB(ProductDB prod) throws SQLException {
-        Connection connection = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mem:testdb",
-                "user", "pass");
+        Connection connection = DriverManager.getConnection(jdbcURL, jdbcUser, jdbcPassword);
         PreparedStatement statement = connection.prepareStatement(insertProd);
         statement.setString(1, prod.name);
         statement.setString(2, prod.type);
@@ -43,8 +44,7 @@ public class JDBC {
 
     @Step("Получить информацию о добавленном продукте")
     public static ProductDB getProductInfoFromDB(String name) throws SQLException {
-        Connection connection = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mem:testdb",
-                "user", "pass");
+        Connection connection = DriverManager.getConnection(jdbcURL, jdbcUser, jdbcPassword);
         PreparedStatement statement = connection.prepareStatement(foodInfo);
         statement.setString(1, name);
         ResultSet resultSet = statement.executeQuery();
@@ -61,8 +61,7 @@ public class JDBC {
 
     @Step("Удалить продукт")
     public static int resetDB(String name) throws SQLException {
-        Connection connection = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mem:testdb",
-                "user", "pass");
+        Connection connection = DriverManager.getConnection(jdbcURL, jdbcUser, jdbcPassword);
         PreparedStatement statement = connection.prepareStatement(deleteString);
         statement.setString(1, name);
         int count = statement.executeUpdate();
