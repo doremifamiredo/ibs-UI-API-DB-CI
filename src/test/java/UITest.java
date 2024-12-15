@@ -1,5 +1,5 @@
 import Helpers.ProductList;
-import io.github.bonigarcia.wdm.WebDriverManager;
+import Helpers.PropertiesManager;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -7,11 +7,16 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static Helpers.PropertiesManager.getPropertiesManager;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Epic("Добавление товаров")
@@ -40,19 +45,32 @@ public class UITest {
 
     ProductList productList = new ProductList();
     public static WebDriver driver;
+    private final PropertiesManager props = getPropertiesManager();
 
     @BeforeAll
-    static void setup() {
-        WebDriverManager.chromedriver().setup();
-    }
+    static void setup() throws MalformedURLException {
+//      //  WebDriverManager.chromedriver().setup();
+
+        }
 
     @BeforeEach
-    void openSite() {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--no-sandbox");
-        options.addArguments("--headless");
-        driver = new ChromeDriver(options);
+    void openSite() throws MalformedURLException {
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        Map<String, Object> selenoidOptions = new HashMap<>();
+        capabilities.setCapability("browserName", "chrome");
+        capabilities.setCapability("browserVersion", "109.0");
+        selenoidOptions.put("enableVNC", false);
+        selenoidOptions.put("enableVideo", false);
+        capabilities.setCapability("selenoid:options", selenoidOptions);
+        try {
+            driver = new RemoteWebDriver(
+                    URI.create(props.getProperty("selenoid.url")).toURL(),
+                    capabilities
+            );
+
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         productList.init(driver);
         driver.get("https://qualit.applineselenoid.fvds.ru/");
